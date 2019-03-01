@@ -38,9 +38,8 @@ void server_handler(){
     server.sin_port = htons(PORT_NO); 
 
     bind(listen_desc, (struct sockaddr*) &server, sizeof(server)); 
-    printf("Listenint on port: %d\n", PORT_NO);
-
     listen(listen_desc, MAX_CONNECTIONS); 
+    printf("Listenint on port: %d\n", PORT_NO);
 
     while(1){
       if(fork() >= 0){

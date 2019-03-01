@@ -16,6 +16,6 @@ It will compile both server.c and client.c (at the moment)
 
 Once the application is compiled you can start the server with ./meteo-tracker
 
-you can then use netcat to connect with it via TCP port 5000
+you can then use netcat to connect with it via TCP port 1042:
 
-```nc localhost 5000```
+```nc localhost 1042```
