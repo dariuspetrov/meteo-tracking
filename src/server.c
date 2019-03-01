@@ -25,8 +25,7 @@ void soap_handler(){
   
 }
 
-/* should fork() this at some point to add multiple connections support */
-void start_server(){ 
+void server_handler(){ 
     int listen_desc = 0, conn_desc = 0;
     struct sockaddr_in server; 
     char sendBuff[1025], recvBuff[1025];
@@ -44,29 +43,35 @@ void start_server(){
     listen(listen_desc, MAX_CONNECTIONS); 
 
     while(1){
-        conn_desc = accept(listen_desc, (struct sockaddr*) NULL, NULL); 
+      if(fork() >= 0){
+	conn_desc = accept(listen_desc, (struct sockaddr*) NULL, NULL); 
 
 	if(conn_desc > 0){
-	  printf("A client connected.\n");
-	}
+	  printf("A client connected - %d\n", conn_desc);
+	  ticks = time(NULL);
+	  printf(sendBuff, sizeof(sendBuff), "%s\r\n", ctime(&ticks));
 
-        ticks = time(NULL);
-	printf(sendBuff, sizeof(sendBuff), "%s\r\n", ctime(&ticks));
+	  /* write(conn_desc, sendBuff, strlen(sendBuff));  */
+	  write(conn_desc, "Connected\n", 11);
 
-        /* write(conn_desc, sendBuff, strlen(sendBuff));  */
-        write(conn_desc, "Connected\n", 11);
-
-	while(read(conn_desc, recvBuff, sizeof(recvBuff - 1)) > 0){
+	  while(read(conn_desc, recvBuff, sizeof(recvBuff - 1)) > 0){
 	    printf("%s\n",recvBuff);
 	    fflush(stdout);
-	}
+	  }
 
-        /* close(conn_desc); */
-        sleep(1);
-     }
+	  sleep(1);
+	  close(conn_desc);
+	  printf("Client disconnected\n");
+	  exit;
+	}
+      }
+      else{
+	// parent process continuing here.
+      }
+    }
 }
 
 int main(){
-  start_server();
+  server_handler();
   return 0;
 }
