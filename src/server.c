@@ -11,48 +11,57 @@
 #include "server.h"
 
 #define PORT_NO 1042
+#define MAX_CONNECTIONS 2048
+
+void admin_handler(){
+  
+}
+
+void client_handler(){
+  
+}
+
+void soap_handler(){
+  
+}
 
 /* should fork() this at some point to add multiple connections support */
 void start_server(){ 
-    int listen_desc = 0, conn_desc = 0, rec = 0;
-    struct sockaddr_in serv_addr; 
+    int listen_desc = 0, conn_desc = 0;
+    struct sockaddr_in server; 
     char sendBuff[1025], recvBuff[1025];
     time_t ticks; 
 
     listen_desc = socket(AF_INET, SOCK_STREAM, 0);
 
-    memset(&serv_addr, '0', sizeof(serv_addr));
-    memset(sendBuff, '0', sizeof(sendBuff)); 
+    server.sin_family = AF_INET;
+    server.sin_addr.s_addr = htonl(INADDR_ANY);
+    server.sin_port = htons(PORT_NO); 
 
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    serv_addr.sin_port = htons(PORT_NO); 
-
-    bind(listen_desc, (struct sockaddr*) &serv_addr, sizeof(serv_addr)); 
+    bind(listen_desc, (struct sockaddr*) &server, sizeof(server)); 
     printf("Listenint on port: %d\n", PORT_NO);
 
-    listen(listen_desc, 10); 
+    listen(listen_desc, MAX_CONNECTIONS); 
 
     while(1){
         conn_desc = accept(listen_desc, (struct sockaddr*) NULL, NULL); 
 
-	if(conn_desc != 0){
-	  printf("A client connected.");
+	if(conn_desc > 0){
+	  printf("A client connected.\n");
 	}
 
         ticks = time(NULL);
-        /* snprintf(sendBuff, sizeof(sendBuff), "%.24s\r\n", ctime(&ticks)); */
 	printf(sendBuff, sizeof(sendBuff), "%s\r\n", ctime(&ticks));
-        write(conn_desc, sendBuff, strlen(sendBuff)); 
 
-	while((rec = read(conn_desc, recvBuff, sizeof(recvBuff-1))) > 0){
-	  if(sizeof(recvBuff) > 0){
-	    fputs(recvBuff, stdout);
-	  }
+        /* write(conn_desc, sendBuff, strlen(sendBuff));  */
+        write(conn_desc, "Connected\n", 11);
+
+	while(read(conn_desc, recvBuff, sizeof(recvBuff - 1)) > 0){
+	    printf("%s\n",recvBuff);
+	    fflush(stdout);
 	}
 
         /* close(conn_desc); */
-	printf(recvBuff);
         sleep(1);
      }
 }
