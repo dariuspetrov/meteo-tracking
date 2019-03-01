@@ -10,6 +10,8 @@ You can use GNU make to compile the program like this:
 
 ```make```
 
+It will compile both server.c and client.c (at the moment)
+
 ## connecting to the server using netcat
 
 Once the application is compiled you can start the server with ./meteo-tracker

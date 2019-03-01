@@ -2,14 +2,15 @@
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <unistd.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <unistd.h>
 #include <errno.h>
 #include <string.h>
+#include <time.h>
 #include "server.h"
 
-#define PORT_NO 5000
+#define PORT_NO 1042
 
 /* should fork() this at some point to add multiple connections support */
 void start_server(){ 
@@ -28,27 +29,35 @@ void start_server(){
     serv_addr.sin_port = htons(PORT_NO); 
 
     bind(listen_desc, (struct sockaddr*) &serv_addr, sizeof(serv_addr)); 
+    printf("Listenint on port: %d\n", PORT_NO);
 
     listen(listen_desc, 10); 
 
     while(1){
         conn_desc = accept(listen_desc, (struct sockaddr*) NULL, NULL); 
 
-        ticks = time(NULL);
-        /* snprintf(sendBuff, sizeof(sendBuff), "%.24s\r\n", ctime(&ticks)); */
-	printf(sendBuff, sizeof(sendBuff), "%.24s\r\n", ctime(&ticks));
-        write(conn_desc, sendBuff, strlen(sendBuff)); 
-
-        /* close(conn_desc); */
-	while((rec = read(conn_desc, recvBuff, sizeof(recvBuff-1))) > 0){
-	    fputs(recvBuff, stdout);
+	if(conn_desc != 0){
+	  printf("A client connected.");
 	}
 
+        ticks = time(NULL);
+        /* snprintf(sendBuff, sizeof(sendBuff), "%.24s\r\n", ctime(&ticks)); */
+	printf(sendBuff, sizeof(sendBuff), "%s\r\n", ctime(&ticks));
+        write(conn_desc, sendBuff, strlen(sendBuff)); 
+
+	while((rec = read(conn_desc, recvBuff, sizeof(recvBuff-1))) > 0){
+	  if(sizeof(recvBuff) > 0){
+	    fputs(recvBuff, stdout);
+	  }
+	}
+
+        /* close(conn_desc); */
 	printf(recvBuff);
         sleep(1);
      }
 }
 
-void server_print(){
-    start_server();
+int main(){
+  start_server();
+  return 0;
 }

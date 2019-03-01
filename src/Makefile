@@ -4,8 +4,16 @@ CFLAGS = -O2 -Wall
 
 default: meteo-tracker
 
-meteo-tracker: main.o server.o
-	$(CC) $(CFLAGS) -o $@ main.o server.o
+server: server.o
+	$(CC) $(CFLAGS) -o server server.o
+
+client: client.o
+	$(CC) $(CFLAGS) -o client client.o
+
+meteo-tracker: client.o server.o
+	# $(CC) $(CFLAGS) $@ client.o server.o
+	$(CC) $(CFLAGS) -o client client.o
+	$(CC) $(CFLAGS) -o server server.o
 
 clean:
-	rm *.o meteo-tracker 
+	rm *.o server client
